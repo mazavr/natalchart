@@ -8,7 +8,9 @@ var RADIUS = {
   2: 212,
   3: 110,
   4: 190,
-  5: 230
+  5: 230,
+  6: 270,
+  7: 250
 };
 
 function toRadians(angle) {
@@ -68,7 +70,37 @@ var createZodiacLine = createLine(RADIUS[3], RADIUS[2], CENTER.X, CENTER.Y, {
 
 //-----------------
 
+function createArcSector(r1, r2, cx, cy, params) {
+  return function (x1, y1, x2, y2) {
+    return createElement('path',
+      $.extend({
+          d: 'M' + (x1 * r1 + cx) + ' ' + (-y1 * r1 + cy) + ' ' +
+          'A ' + r1 + ' ' + r1 + ', 0, 0, 0, ' + (x2 * r1 + cx) + ' ' + (-y2 * r1 + cy) + ' ' +
+
+            'L ' + (x2 * r2 + cx) + ' ' + (-y2 * r2 + cy) + ' ' +
+          'A ' + r2 + ' ' + r2 + ', 0, 0, 1, ' + (x1 * r2 + cx) + ' ' + (-y1 * r2 + cy) + ' ' +
+            'Z'
+        }, params
+      ));
+  }
+}
+
+var createZodiacArcSector = createArcSector(RADIUS[6], RADIUS[7], CENTER.X, CENTER.Y, {
+  "stroke": "orange",
+  "stroke-width": 1,
+  fill: 'none'
+});
+
+
+//-----------------
+
 var svg = document.getElementById('svg');
+
+var dataArcLines = [[0, 80], [90, 170], [180,260], [270, 350]];
+
+for (var i = 0; i < dataArcLines.length; i++) {
+  svg.appendChild(handleTwoVectors(dataArcLines[i][0], dataArcLines[i][1], createZodiacArcSector));
+}
 
 var cc = createElement('circle', {
   "cx": CENTER.X,
@@ -152,6 +184,7 @@ for (var i = 0; i < dataLines.length; i++) {
     });
   }));
 }
+
 
 var data = [15, 30, 276, 160];
 
