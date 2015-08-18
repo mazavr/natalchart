@@ -7,7 +7,8 @@ var RADIUS = {
   1: 180,
   2: 212,
   3: 110,
-  4: 190
+  4: 190,
+  5: 230
 };
 
 function toRadians(angle) {
@@ -39,6 +40,31 @@ function createElement(name, attrs) {
   }
   return element;
 }
+
+//-----------------
+
+function createLine(r1, r2, cx, cy, params) {
+  return function (x, y) {
+    return createElement('line',
+      $.extend({
+          x2: x * r2 + cx,
+          y2: -y * r2 + cy,
+          x1: x * r1 + cx,
+          y1: -y * r1 + cy
+        }, params
+      ));
+  }
+}
+
+var createHomeLine = createLine(RADIUS[5], RADIUS[2], CENTER.X, CENTER.Y, {
+  "stroke": "blue",
+  "stroke-width": 2
+});
+
+var createZodiacLine = createLine(RADIUS[3], RADIUS[2], CENTER.X, CENTER.Y, {
+  "stroke": "black",
+  "stroke-width": 1
+});
 
 //-----------------
 
@@ -78,16 +104,13 @@ var cc = createElement('circle', {
 svg.appendChild(cc);
 
 for (var i = 0; i < 360; i += 30) {
-  svg.appendChild(handleVector(i, function (x, y) {
-    return createElement('line', {
-      "x2": x * RADIUS[2] + CENTER.X,
-      "y2": y * RADIUS[2] + CENTER.Y,
-      x1: x * RADIUS[3] + CENTER.X,
-      y1: y * RADIUS[3] + CENTER.Y,
-      "stroke": "black",
-      "stroke-width": 1
-    });
-  }));
+  svg.appendChild(handleVector(i, createZodiacLine));
+}
+
+var homes = [10, 65, 100, 150, 190, 210, 220, 290];
+
+for (var i = 0; i < homes.length; i++) {
+  svg.appendChild(handleVector(homes[i], createHomeLine));
 }
 
 for (var i = 15; i < 360; i += 30) {
