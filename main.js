@@ -13,6 +13,19 @@ var RADIUS = {
   7: 250
 };
 
+
+//----------------
+
+var zdLines = [];
+
+for (var i = 0; i < 360; i += 30) {
+  zdLines.push(i);
+}
+
+var homes = [10, 65, 100, 150, 190, 210, 220, 290];
+
+//----------------
+
 function toRadians(angle) {
   return angle * Math.PI / 180;
 }
@@ -76,10 +89,9 @@ function createArcSector(r1, r2, cx, cy, params) {
       $.extend({
           d: 'M' + (x1 * r1 + cx) + ' ' + (-y1 * r1 + cy) + ' ' +
           'A ' + r1 + ' ' + r1 + ', 0, 0, 0, ' + (x2 * r1 + cx) + ' ' + (-y2 * r1 + cy) + ' ' +
-
-            'L ' + (x2 * r2 + cx) + ' ' + (-y2 * r2 + cy) + ' ' +
+          'L ' + (x2 * r2 + cx) + ' ' + (-y2 * r2 + cy) + ' ' +
           'A ' + r2 + ' ' + r2 + ', 0, 0, 1, ' + (x1 * r2 + cx) + ' ' + (-y1 * r2 + cy) + ' ' +
-            'Z'
+          'Z'
         }, params
       ));
   }
@@ -96,11 +108,11 @@ var createZodiacArcSector = createArcSector(RADIUS[6], RADIUS[7], CENTER.X, CENT
 
 var svg = document.getElementById('svg');
 
-var dataArcLines = [[0, 80], [90, 170], [180,260], [270, 350]];
+var dataArcLines = [[0, 80], [90, 170], [180, 260], [270, 350]];
 
-for (var i = 0; i < dataArcLines.length; i++) {
-  svg.appendChild(handleTwoVectors(dataArcLines[i][0], dataArcLines[i][1], createZodiacArcSector));
-}
+dataArcLines.forEach(function(dal){
+  svg.appendChild(handleTwoVectors(dal[0], dal[1], createZodiacArcSector));
+});
 
 var cc = createElement('circle', {
   "cx": CENTER.X,
@@ -135,15 +147,13 @@ var cc = createElement('circle', {
 
 svg.appendChild(cc);
 
-for (var i = 0; i < 360; i += 30) {
-  svg.appendChild(handleVector(i, createZodiacLine));
-}
+zdLines.forEach(function (angle) {
+  svg.appendChild(handleVector(angle, createZodiacLine));
+});
 
-var homes = [10, 65, 100, 150, 190, 210, 220, 290];
-
-for (var i = 0; i < homes.length; i++) {
-  svg.appendChild(handleVector(homes[i], createHomeLine));
-}
+homes.forEach(function(h){
+  svg.appendChild(handleVector(h, createHomeLine));
+});
 
 for (var i = 15; i < 360; i += 30) {
   svg.appendChild(handleVector(i, function (x, y) {
