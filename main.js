@@ -9,20 +9,27 @@ var RADIUS = {
   3: 110,
   4: 190,
   5: 230,
-  6: 270,
-  7: 250
+  6: 240,
+  7: 270
 };
-
 
 //----------------
 
 var zdLines = [];
-
 for (var i = 0; i < 360; i += 30) {
   zdLines.push(i);
 }
 
 var homes = [10, 65, 100, 150, 190, 210, 220, 290];
+
+var colors = ['red', 'green', 'orange', 'lime', 'blue'];
+var dataArcLines = [];
+var j = 0;
+for (var i = 0; i < 360; i += 30) {
+  var elem = [i, i + 30, colors[j++ % (colors.length)]];
+  dataArcLines.push(elem);
+}
+//var dataArcLines = [[0, 80, 'red'], [90, 170, 'green'], [180, 260, 'orange'], [270, 350, 'lime']];
 
 //----------------
 
@@ -73,7 +80,7 @@ function createLine(r1, r2, cx, cy, params) {
 
 var createHomeLine = createLine(RADIUS[5], RADIUS[2], CENTER.X, CENTER.Y, {
   "stroke": "blue",
-  "stroke-width": 2
+  "stroke-width": 3
 });
 
 var createZodiacLine = createLine(RADIUS[3], RADIUS[2], CENTER.X, CENTER.Y, {
@@ -84,7 +91,7 @@ var createZodiacLine = createLine(RADIUS[3], RADIUS[2], CENTER.X, CENTER.Y, {
 //-----------------
 
 function createArcSector(r1, r2, cx, cy, params) {
-  return function (x1, y1, x2, y2) {
+  return function (x1, y1, x2, y2, params2) {
     return createElement('path',
       $.extend({
           d: 'M' + (x1 * r1 + cx) + ' ' + (-y1 * r1 + cy) + ' ' +
@@ -92,66 +99,60 @@ function createArcSector(r1, r2, cx, cy, params) {
           'L ' + (x2 * r2 + cx) + ' ' + (-y2 * r2 + cy) + ' ' +
           'A ' + r2 + ' ' + r2 + ', 0, 0, 1, ' + (x1 * r2 + cx) + ' ' + (-y1 * r2 + cy) + ' ' +
           'Z'
-        }, params
+        }, params, params2
       ));
   }
 }
 
 var createZodiacArcSector = createArcSector(RADIUS[6], RADIUS[7], CENTER.X, CENTER.Y, {
-  "stroke": "orange",
-  "stroke-width": 1,
+  stroke: 'black',
+  'stroke-width': 1,
   fill: 'none'
 });
-
 
 //-----------------
 
 var svg = document.getElementById('svg');
 
-var dataArcLines = [[0, 80], [90, 170], [180, 260], [270, 350]];
-
-dataArcLines.forEach(function(dal){
-  svg.appendChild(handleTwoVectors(dal[0], dal[1], createZodiacArcSector));
+dataArcLines.forEach(function (dal) {
+  handleTwoVectors(dal[0], dal[1], function (x1, y1, x2, y2) {
+    svg.appendChild(createZodiacArcSector(x1, y1, x2, y2, {fill: dal[2]}));
+  });
 });
 
-var cc = createElement('circle', {
+svg.appendChild(createElement('circle', {
   "cx": CENTER.X,
   "cy": CENTER.Y,
   r: RADIUS[3],
   fill: 'none',
   "stroke": "black",
   "stroke-width": 1
-});
+}));
 
-svg.appendChild(cc);
 
-var cc = createElement('circle', {
+svg.appendChild(createElement('circle', {
   "cx": CENTER.X,
   "cy": CENTER.Y,
   r: RADIUS[1],
   fill: 'none',
   "stroke": "black",
   "stroke-width": 1
-});
+}));
 
-svg.appendChild(cc);
-
-var cc = createElement('circle', {
+svg.appendChild(createElement('circle', {
   "cx": CENTER.X,
   "cy": CENTER.Y,
   r: RADIUS[2],
   fill: 'none',
   "stroke": "black",
   "stroke-width": 1
-});
-
-svg.appendChild(cc);
+}));
 
 zdLines.forEach(function (angle) {
   svg.appendChild(handleVector(angle, createZodiacLine));
 });
 
-homes.forEach(function(h){
+homes.forEach(function (h) {
   svg.appendChild(handleVector(h, createHomeLine));
 });
 
@@ -179,7 +180,6 @@ for (var i = 15; i < 360; i += 30) {
   }));
 }
 
-
 var dataLines = [[15, 276], [276, 30], [276, 160]];
 
 for (var i = 0; i < dataLines.length; i++) {
@@ -194,7 +194,6 @@ for (var i = 0; i < dataLines.length; i++) {
     });
   }));
 }
-
 
 var data = [15, 30, 276, 160];
 
